@@ -106,6 +106,51 @@ struct tanh_grad {
   }
 };
 
+
+struct ptanh {
+  template<typename DType>
+  MSHADOW_XINLINE static DType Map(DType x, DType a) {
+    return DType(x >= 0.0f ? tanhf(x) : a * tanhf(x));
+  }
+};
+
+struct ptanh_grad {
+  template<typename DType>
+  MSHADOW_XINLINE static DType Map(DType x, DType a) {
+    return DType(x >= 0.0f ? 1.0f - x * x : a * (1.0f - x * x));
+  }
+};
+
+
+struct shift_ptanh {
+  template<typename DType>
+  MSHADOW_XINLINE static DType Map(DType x, DType a) {
+    return DType(x >= -a ? tanhf(x) : a * tanhf(x));
+  }
+};
+
+struct shift_ptanh_grad {
+  template<typename DType>
+  MSHADOW_XINLINE static DType Map(DType x, DType a) {
+    return DType(x >= tanhf(-a) ? 1.0f - x * x : a * (1.0f - x * x));
+  }
+};
+
+struct shift_xelu {
+  template<typename DType>
+  MSHADOW_XINLINE static DType Map(DType a, DType b) {
+    return DType(a >= -b ? a : b * a + b * b - b);
+  }
+};
+
+struct shift_xelu_grad {
+  template<typename DType>
+  MSHADOW_XINLINE static DType Map(DType a, DType b) {
+    return DType(a >= -b ? 1.0f : b);
+  }
+};
+
+
 /*! \brief SoftReLU, also known as softplus activation. */
 struct softrelu {
   template<typename DType>
